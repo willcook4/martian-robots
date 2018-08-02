@@ -28,6 +28,20 @@ console.log('robotStartY: ', robotStartY);
 let robotStartDirection = sampleInput[4]
 console.log('robotStartDirection: ', robotStartDirection);
 
-// First movement
-let movementInstructions = sampleInput.substring(5)
+let movementInstructions = sampleInput.substring(5).split('')
 console.log('movementInstructions: ', movementInstructions);
+
+let movementHistory = [] // store the last coordinates and direction
+
+// push in the start position
+movementHistory.push({
+  xPos: robotStartX,
+  yPos: robotStartY,
+  direction: robotStartDirection
+})
+
+console.log(movementHistory);
+
+movementInstructions.map((instruction, index) => {
+  console.log(`${index}: `, instruction)
+})
