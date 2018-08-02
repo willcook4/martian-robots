@@ -44,4 +44,19 @@ console.log(movementHistory);
 
 movementInstructions.map((instruction, index) => {
   console.log(`${index}: `, instruction)
+  switch (instruction) {
+    case 'R':
+      console.log('Right turn')
+      break
+    case 'L':
+      console.log('Left turn')
+      break
+    case 'F':
+      console.log('Move "forward"')
+      break
+  }
 })
+
+/* TODOs
+  - ensure all inputs are uppercase
+*/
