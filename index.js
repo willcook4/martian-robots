@@ -6,16 +6,27 @@ RFRFRFRF
 
 RF RF RF RF
 */
-let sampleInput = `
+let sampleInput0 = `
 5 3
 1 1 E
 RFRFRFRF
 `
 
-/* Sample Output
+/* Sample Output0
 1 1 E
-
 */
+
+let sampleInput2 =`
+  5 3
+  0 3 W
+  LLFFFLFLFL
+`
+/*  Sample output
+2 3 S
+*/
+
+let sampleInput = sampleInput2
+
 /* Setup "Landing" */
 sampleInput = sampleInput.replace(/\s/g, '')
 console.log('sampleInput: ', sampleInput)
@@ -152,6 +163,10 @@ movementInstructions.map((instruction, index) => {
         xPos: movementHistory[movementHistory.length - 1].xPos,
         yPos: movementHistory[movementHistory.length - 1].yPos},
       movementHistory[movementHistory.length - 1].direction)
+
+      // check if fallen off the planet gridWorld
+
+      // check if a previous robot 'scent' is present
 
       movementHistory.push({
         xPos: newLocation.xPos, // last xPos
