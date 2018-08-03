@@ -6,26 +6,38 @@ RFRFRFRF
 
 RF RF RF RF
 */
-let sampleInput0 = `
+let sampleInput1 = `
 5 3
 1 1 E
 RFRFRFRF
 `
 
-/* Sample Output0
+/* Sample Output1
 1 1 E
 */
 
-let sampleInput2 =`
+let sampleInput2 = `
+5 3
+3 2 N
+FRRFLLFFRRFLL
+`
+/* sampleOutput2
+  3 3 N LOST
+*/
+
+let sampleInput3 =`
   5 3
   0 3 W
   LLFFFLFLFL
 `
-/*  Sample output
+/*  Sample output3
 2 3 S
 */
 
 let sampleInput = sampleInput2
+let debug = false // TODO
+
+// TODO remove the 5 3 from the sampleInput2 3
 
 /* Setup "Landing" */
 sampleInput = sampleInput.replace(/\s/g, '')
@@ -137,6 +149,45 @@ let _updateLocation = (previousLocation, direction) => {
   return newLocation
 }
 
+let _checkIfOffGrid = (newLocation) => {
+  let offGrid = false
+  if (newLocation.xPos > gridWorldWidth) {
+    console.log('Robot fell off the Eastern edge at: ', newLocation) // - 1  for last safe position??
+    offGrid = true
+  }
+  if (newLocation.yPos > gridWorldHeight) {
+    console.log('Robot fell off the Northern edge at: ', newLocation)
+    offGrid = true
+  }
+  if (newLocation.xPos < 0) {
+    console.log('Robot fell off the Southern edge at: ', newLocation)
+    offGrid = true
+  }
+  if (newLocation.yPos < 0) {
+    console.log('Robot fell off the Western edge at: ', newLocation)
+    offGrid = true
+  }
+  console.log('Robot is offGrid: ', offGrid)
+  return offGrid
+}
+
+let scents = [{xPos: 3, yPos: 3, direction: 'N'}]
+// []
+
+let _checkForScent = (lastLocation) => {
+  let match = false
+  scents.map(scent => {
+    if (lastLocation.xPos === scent.xPos &&
+      lastLocation.yPos === scent.yPos &&
+      lastLocation.direction === scent.direction
+    ) {
+      match = true
+    }
+  })
+  console.log('Previous robot been here? ', match)
+  return match
+}
+
 movementInstructions.map((instruction, index) => {
   console.log(`${index}: `, instruction)
   switch (instruction) {
@@ -165,8 +216,24 @@ movementInstructions.map((instruction, index) => {
       movementHistory[movementHistory.length - 1].direction)
 
       // check if fallen off the planet gridWorld
+      // _checkIfOffGrid(newLocation)
 
-      // check if a previous robot 'scent' is present
+      // check if a previous robot 'scent' is present at that location
+      _checkForScent({
+        xPos: movementHistory[movementHistory.length - 1].xPos,
+        yPos: movementHistory[movementHistory.length - 1].yPos,
+        direction: movementHistory[movementHistory.length - 1].direction}
+      )
+
+      if (_checkIfOffGrid(newLocation) === true) { // if no scent, robot is LOST
+        console.log('LOST!!!! adding to scents')
+        scents.push({
+          xPos: movementHistory[movementHistory.length - 1].xPos, // last xPos
+          yPos: movementHistory[movementHistory.length - 1].yPos, // last xPos
+          direction: movementHistory[movementHistory.length - 1].direction
+        })
+        console.log('scents: ', scents);
+      }
 
       movementHistory.push({
         xPos: newLocation.xPos, // last xPos
