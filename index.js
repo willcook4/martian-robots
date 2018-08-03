@@ -1,70 +1,5 @@
-/*
-Sample input:
-5 3
-1 1 E
-RFRFRFRF
 
-RF RF RF RF
-*/
-let sampleInput1 = `
-5 3
-1 1 E
-RFRFRFRF
-`
-
-/* Sample Output1
-1 1 E
-*/
-
-let sampleInput2 = `
-5 3
-3 2 N
-FRRFLLFFRRFLL
-`
-/* sampleOutput2
-  3 3 N LOST
-*/
-
-let sampleInput3 =`
-  5 3
-  0 3 W
-  LLFFFLFLFL
-`
-/*  Sample output3
-2 3 S
-*/
-
-let sampleInput = sampleInput2
-let debug = false // TODO
-
-// TODO remove the 5 3 from the sampleInput2 3
-
-/* Setup "Landing" */
-sampleInput = sampleInput.replace(/\s/g, '')
-console.log('sampleInput: ', sampleInput)
-let gridWorldWidth = sampleInput[0]
-// console.log('gridWorldWidth:', gridWorldWidth);
-let gridWorldHeight = sampleInput[1]
-// console.log('gridWorldHeight: ', gridWorldHeight);
-let robotStartX = sampleInput[2]
-console.log('robotStartX: ', robotStartX);
-let robotStartY = sampleInput[3]
-console.log('robotStartY: ', robotStartY);
-let robotStartDirection = sampleInput[4]
-console.log('robotStartDirection: ', robotStartDirection);
-
-let movementInstructions = sampleInput.substring(5).split('')
-console.log('movementInstructions: ', movementInstructions);
-
-let movementHistory = [] // store the last coordinates and direction
-
-// push in the start position
-movementHistory.push({
-  xPos: parseInt(robotStartX),
-  yPos: parseInt(robotStartY),
-  direction: robotStartDirection
-})
-
+// Functions
 let _parseNewDirection = (lastDirection, instructionDirection) => {
   let newDirection
   switch (lastDirection) {
@@ -171,8 +106,8 @@ let _checkIfOffGrid = (newLocation) => {
   return offGrid
 }
 
-let scents = [{xPos: 3, yPos: 3, direction: 'N'}]
-// []
+// let scents = [{xPos: 3, yPos: 3, direction: 'N'}] // TESTING
+let scents = []
 
 let _checkForScent = (lastLocation) => {
   let match = false
@@ -188,65 +123,180 @@ let _checkForScent = (lastLocation) => {
   return match
 }
 
-movementInstructions.map((instruction, index) => {
-  console.log(`${index}: `, instruction)
-  switch (instruction) {
-    case 'R':
-      console.log('Right turn')
-      movementHistory.push({
-        xPos: movementHistory[movementHistory.length - 1].xPos, // last xPos
-        yPos: movementHistory[movementHistory.length - 1].yPos, // last xPos
-        direction: _parseNewDirection(movementHistory[movementHistory.length - 1].direction, instruction)
-      })
-      break
-    case 'L':
-      console.log('Left turn')
-      movementHistory.push({
-        xPos: movementHistory[movementHistory.length - 1].xPos, // last xPos
-        yPos: movementHistory[movementHistory.length - 1].yPos, // last xPos
-        direction: _parseNewDirection(movementHistory[movementHistory.length - 1].direction, instruction)
-      })
-      break
-    case 'F':
-      console.log('Move "forward"')
-      // Detect if the robot has gone off the edge of the planet
-      let newLocation = _updateLocation({
-        xPos: movementHistory[movementHistory.length - 1].xPos,
-        yPos: movementHistory[movementHistory.length - 1].yPos},
-      movementHistory[movementHistory.length - 1].direction)
-
-      // check if fallen off the planet gridWorld
-      // _checkIfOffGrid(newLocation)
-
-      // check if a previous robot 'scent' is present at that location
-      _checkForScent({
-        xPos: movementHistory[movementHistory.length - 1].xPos,
-        yPos: movementHistory[movementHistory.length - 1].yPos,
-        direction: movementHistory[movementHistory.length - 1].direction}
-      )
-
-      if (_checkIfOffGrid(newLocation) === true) { // if no scent, robot is LOST
-        console.log('LOST!!!! adding to scents')
-        scents.push({
-          xPos: movementHistory[movementHistory.length - 1].xPos, // last xPos
-          yPos: movementHistory[movementHistory.length - 1].yPos, // last xPos
-          direction: movementHistory[movementHistory.length - 1].direction
-        })
-        console.log('scents: ', scents);
-      }
-
-      movementHistory.push({
-        xPos: newLocation.xPos, // last xPos
-        yPos: newLocation.yPos, // last xPos
-        direction: movementHistory[movementHistory.length - 1].direction
-      })
-      break
-  }
-
-  console.log('Last position: ', movementHistory[movementHistory.length - 1])
-  console.log(' ')
-})
-
 /* TODOs
   - ensure all inputs are uppercase
+  - Add debugging
+  - clean up output
 */
+
+
+/*
+Sample input:
+5 3
+1 1 E
+RFRFRFRF
+
+RF RF RF RF
+*/
+let sampleInput1 = `
+5 3
+1 1 E
+RFRFRFRF
+`
+
+/* Sample Output1
+1 1 E
+*/
+
+let sampleInput2 = `
+5 3
+3 2 N
+FRRFLLFFRRFLL
+`
+/* sampleOutput2
+  3 3 N LOST
+*/
+
+let sampleInput3 =`
+  5 3
+  0 3 W
+  LLFFFLFLFL
+`
+/*  Sample output3
+2 3 S
+*/
+
+let sampleInputAll = `
+5 3
+1 1 E
+RFRFRFRF
+3 2 N
+FRRFLLFFRRFLL
+0 3 W
+LLFFFLFLFL
+`
+
+let sampleInput = sampleInputAll
+let debugging = true
+
+sampleInput = sampleInput.replace(/\s/g, '') // remove whitespaces
+
+let gridWorldWidth = sampleInput[0]
+if (debugging) { console.log('gridWorldWidth:', gridWorldWidth) }
+let gridWorldHeight = sampleInput[1]
+
+let robotInstructions = sampleInput.substring(2)
+if (debugging) { console.log('robotInstructions: ', robotInstructions) }
+
+// console.log(': ', robotInstructions.match(/\d\d[A-Z]+[^\d]/gi))
+let robots = robotInstructions.match(/\d\d[A-Z]+[^\d]/gi)
+
+robots.map((robot, index) => {
+  if (debugging) { console.log('Robot (', index , ') ',robot) }
+
+  let robotStartX = robot[0]
+  // console.log('robotStartX: ', robotStartX);
+  let robotStartY = robot[1]
+  // console.log('robotStartY: ', robotStartY);
+  let robotStartDirection = robot[2]
+  // console.log('robotStartDirection: ', robotStartDirection);
+
+  let movementInstructions = robot.substring(3).split('')
+  console.log('movementInstructions: ', movementInstructions);
+
+  let movementHistory = [] // store the last coordinates and direction
+
+  // // push in the start position
+  movementHistory.push({
+    xPos: parseInt(robotStartX),
+    yPos: parseInt(robotStartY),
+    direction: robotStartDirection
+  })
+  console.log(movementHistory);
+
+  /* Run through the instructions */
+  // movementInstructions.map((instruction, index) => {
+  for (var i = 0; i < movementInstructions.length; i++) {
+    let robotLost = false
+    if (robotLost) {
+      console.log('SKIPPING ROBOT LOST');
+      break
+    }
+
+    let instruction = movementInstructions[i]
+    console.log(`${i}: `, instruction)
+    switch (instruction) {
+      case 'R':
+        console.log('Right turn')
+        movementHistory.push({
+          xPos: movementHistory[movementHistory.length - 1].xPos, // last xPos
+          yPos: movementHistory[movementHistory.length - 1].yPos, // last xPos
+          direction: _parseNewDirection(movementHistory[movementHistory.length - 1].direction, instruction)
+        })
+        break
+      case 'L':
+        console.log('Left turn')
+        movementHistory.push({
+          xPos: movementHistory[movementHistory.length - 1].xPos, // last xPos
+          yPos: movementHistory[movementHistory.length - 1].yPos, // last xPos
+          direction: _parseNewDirection(movementHistory[movementHistory.length - 1].direction, instruction)
+        })
+        break
+      case 'F':
+        console.log('Move "forward"')
+        // Detect if the robot has gone off the edge of the planet
+        let newLocation = _updateLocation({
+          xPos: movementHistory[movementHistory.length - 1].xPos,
+          yPos: movementHistory[movementHistory.length - 1].yPos},
+        movementHistory[movementHistory.length - 1].direction)
+
+        // check if a previous robot 'scent' is present at that location
+        let smellForScent = _checkForScent({
+          xPos: movementHistory[movementHistory.length - 1].xPos,
+          yPos: movementHistory[movementHistory.length - 1].yPos,
+          direction: movementHistory[movementHistory.length - 1].direction}
+        )
+        if (smellForScent) {
+          // ignore moevemt, previous robot fell off here
+          console.log('ignoring instruction, do not want to fall off like the last one')
+          break
+        }
+
+        if (_checkIfOffGrid(newLocation) === true) { // no scent, robot is LOST
+          console.log('LOST!!!! adding to scents')
+          scents.push({
+            xPos: movementHistory[movementHistory.length - 1].xPos, // last xPos
+            yPos: movementHistory[movementHistory.length - 1].yPos, // last xPos
+            direction: movementHistory[movementHistory.length - 1].direction
+          })
+          console.log('Updated scents: ', scents)
+          robotLost = true
+          break
+        }
+
+        movementHistory.push({
+          xPos: newLocation.xPos, // last xPos
+          yPos: newLocation.yPos, // last xPos
+          direction: movementHistory[movementHistory.length - 1].direction
+        })
+        break
+    }
+
+    // console.log('Last position: ', movementHistory[movementHistory.length - 1])
+    if (robotLost) {
+      console.log(movementHistory[movementHistory.length - 1].xPos.toString(),
+                  // ' ',
+                  movementHistory[movementHistory.length - 1].yPos.toString(),
+                  // ' ',
+                  movementHistory[movementHistory.length - 1].direction,
+                  'LOST')
+      break
+    }
+    if (i === (movementInstructions.length - 1)) {
+      if (debugging) { console.log('LAST ONE: ') }
+      console.log(`${movementHistory[movementHistory.length - 1].xPos.toString()} ${movementHistory[movementHistory.length - 1].yPos.toString()} ${movementHistory[movementHistory.length - 1].direction}`)
+      console.log('_____')
+    }
+    console.log(' ')
+  }
+})
