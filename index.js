@@ -1,5 +1,8 @@
 
-// Functions
+/* Functions */
+
+// Returns the new direction (N, S, E W) for when a robot turns, instruction direction given( L || R )
+// Takes in old direction string and returns new direction string
 let _parseNewDirection = (lastDirection, instructionDirection) => {
   let newDirection
   switch (lastDirection) {
@@ -50,65 +53,61 @@ let _parseNewDirection = (lastDirection, instructionDirection) => {
   return newDirection
 }
 
+// Takes a previous location and direction and adds the movement to it.
 let _updateLocation = (previousLocation, direction) => {
-  // console.log('previousLocation: ', previousLocation)
-  // console.log('direction: ', direction)
   let newLocation
   switch (direction) {
     case 'N':
       // y++
       newLocation = previousLocation
       newLocation.yPos = parseInt(previousLocation.yPos) + 1
-      // console.log('New location is +1 y? ', newLocation)
       break
     case 'E':
       // x++
       newLocation = previousLocation
       newLocation.xPos = parseInt(previousLocation.xPos) + 1
-      // console.log('New location is +1 x? ', newLocation)
       break
     case 'S':
       // y--
       newLocation = previousLocation
       newLocation.yPos = parseInt(previousLocation.yPos) - 1
-      // console.log('New location is -1 Y? ', newLocation)
       break
     case 'W':
       // x--
       newLocation = previousLocation
       newLocation.xPos = parseInt(previousLocation.xPos) - 1
-      // console.log('New location is -1 X? ', newLocation)
       break
   }
-  // console.log('returning newlocation: ', newLocation)
   return newLocation
 }
 
+// Check to see if the new location is off the planet grid
+// returns Boolean
 let _checkIfOffGrid = (newLocation) => {
   let offGrid = false
   if (newLocation.xPos > gridWorldWidth) {
-    // console.log('Robot fell off the Eastern edge at: ', newLocation) // - 1  for last safe position??
+    // Robot fell off the Eastern edge
     offGrid = true
   }
   if (newLocation.yPos > gridWorldHeight) {
-    // console.log('Robot fell off the Northern edge at: ', newLocation)
+    // Robot fell off the Northern edge
     offGrid = true
   }
   if (newLocation.xPos < 0) {
-    // console.log('Robot fell off the Southern edge at: ', newLocation)
+    // Robot fell off the Southern edge
     offGrid = true
   }
   if (newLocation.yPos < 0) {
-    // console.log('Robot fell off the Western edge at: ', newLocation)
+    // Robot fell off the Western edge
     offGrid = true
   }
-  // console.log('Robot is offGrid: ', offGrid)
   return offGrid
 }
 
-// let scents = [{xPos: 3, yPos: 3, direction: 'N'}] // TESTING
+// Global record of robot scents, last location before falling off planet
 let scents = []
 
+// returns Boolean of scent match on the last location provided
 let _checkForScent = (lastLocation) => {
   let match = false
   scents.map(scent => {
@@ -119,15 +118,13 @@ let _checkForScent = (lastLocation) => {
       match = true
     }
   })
-  // console.log('Previous robot been here? ', match)
   return match
 }
 
 /* TODOs
   - ensure all inputs are uppercase
-  - clean up output
+  - tests
 */
-
 
 /*
 Sample input:
@@ -176,57 +173,39 @@ LLFFFLFLFL
 `
 
 let sampleInput = sampleInputAll
-let debugging = false
 
 sampleInput = sampleInput.replace(/\s/g, '') // remove whitespaces
-
-let gridWorldWidth = sampleInput[0]
-if (debugging) { console.log('gridWorldWidth:', gridWorldWidth) }
-let gridWorldHeight = sampleInput[1]
-
+let gridWorldWidth = sampleInput[0] // The width of the planet grid
+let gridWorldHeight = sampleInput[1] // The height the planet grid
 let robotInstructions = sampleInput.substring(2)
-if (debugging) { console.log('robotInstructions: ', robotInstructions) }
-
-// console.log(': ', robotInstructions.match(/\d\d[A-Z]+[^\d]/gi))
 let robots = robotInstructions.match(/\d\d[A-Z]+[^\d]/gi)
 
 robots.map((robot, index) => {
-  if (debugging) { console.log('Robot (', index, ') ', robot) }
-
-  let robotStartX = robot[0]
-  // console.log('robotStartX: ', robotStartX);
-  let robotStartY = robot[1]
-  // console.log('robotStartY: ', robotStartY);
-  let robotStartDirection = robot[2]
-  // console.log('robotStartDirection: ', robotStartDirection);
-
-  let movementInstructions = robot.substring(3).split('')
-  if (debugging) { console.log('movementInstructions: ', movementInstructions) }
+  let robotStartX = robot[0] // robot starting X position
+  let robotStartY = robot[1] // robot starting Y position
+  let robotStartDirection = robot[2] // robot starting direction
+  let movementInstructions = robot.substring(3).split('') // movement instructions for this robot
 
   let movementHistory = [] // store the last coordinates and direction
 
-  // // push in the start position
+  // push in the start position
   movementHistory.push({
     xPos: parseInt(robotStartX),
     yPos: parseInt(robotStartY),
     direction: robotStartDirection
   })
-  if (debugging) { console.log(movementHistory) }
 
   /* Run through the instructions */
-  // movementInstructions.map((instruction, index) => {
-  for (var i = 0; i < movementInstructions.length; i++) {
+  for (var i = 0; i < movementInstructions.length; i++) { // not mappping as need to break
     let robotLost = false
     if (robotLost) {
-      if (debugging) { console.log('SKIPPING ROBOT LOST') }
+      // Skipping the rest of moevement instructions the robot is lost
       break
     }
 
     let instruction = movementInstructions[i]
-    if (debugging) { console.log(`${i}: `, instruction) }
     switch (instruction) {
       case 'R':
-        if (debugging) { console.log('Right turn') }
         movementHistory.push({
           xPos: movementHistory[movementHistory.length - 1].xPos, // last xPos
           yPos: movementHistory[movementHistory.length - 1].yPos, // last xPos
@@ -234,7 +213,6 @@ robots.map((robot, index) => {
         })
         break
       case 'L':
-        if (debugging) { console.log('Left turn') }
         movementHistory.push({
           xPos: movementHistory[movementHistory.length - 1].xPos, // last xPos
           yPos: movementHistory[movementHistory.length - 1].yPos, // last xPos
@@ -242,7 +220,7 @@ robots.map((robot, index) => {
         })
         break
       case 'F':
-        if (debugging) { console.log('Move "forward"') }
+        // Move "forward"
         // Detect if the robot has gone off the edge of the planet
         let newLocation = _updateLocation({
           xPos: movementHistory[movementHistory.length - 1].xPos,
@@ -257,18 +235,15 @@ robots.map((robot, index) => {
         )
         if (smellForScent) {
           // ignore moevemt, previous robot fell off here
-          if (debugging) { console.log('ignoring instruction, do not want to fall off like the last one') }
           break
         }
 
         if (_checkIfOffGrid(newLocation) === true) { // no scent, robot is LOST
-          if (debugging) { console.log('LOST!!!! adding to scents') }
           scents.push({
             xPos: movementHistory[movementHistory.length - 1].xPos, // last xPos
             yPos: movementHistory[movementHistory.length - 1].yPos, // last xPos
-            direction: movementHistory[movementHistory.length - 1].direction
+            direction: movementHistory[movementHistory.length - 1].direction // last direction
           })
-          if (debugging) { console.log('Updated scents: ', scents) }
           robotLost = true
           break
         }
@@ -281,15 +256,14 @@ robots.map((robot, index) => {
         break
     }
 
-    // console.log('Last position: ', movementHistory[movementHistory.length - 1])
     if (robotLost) {
+      // Last position report for lost robot
       console.log(`${movementHistory[movementHistory.length - 1].xPos.toString()} ${movementHistory[movementHistory.length - 1].yPos.toString()} ${movementHistory[movementHistory.length - 1].direction} LOST`)
       break
     }
     if (i === (movementInstructions.length - 1)) {
-      if (debugging) { console.log('LAST ONE: ') }
+      // LAST movementInstruction
       console.log(`${movementHistory[movementHistory.length - 1].xPos.toString()} ${movementHistory[movementHistory.length - 1].yPos.toString()} ${movementHistory[movementHistory.length - 1].direction}`)
-      if (debugging) { console.log('_____') }
     }
   }
 })
