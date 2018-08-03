@@ -1,6 +1,6 @@
-##Will Cook, August 2018
+## Will Cook, August 2018
 
-###Notes
+### Notes
 **To run this application:**
 You must have node installed. if you do not then I suggest following the instructions [here:](https://github.com/creationix/nvm).
 
@@ -14,7 +14,7 @@ run `yarn` from the terminal *or* if your not using yarn use npm with `npm insta
 
 The application will run with the sample data. The logged output in the terminal will be the application output. There is no need to quit, the application does this when it is done.
 
-###File structure
+### File structure
 
 - .git ===> needed for git tracking
 - node_modules ===> stores the packages used
@@ -25,7 +25,7 @@ The application will run with the sample data. The logged output in the terminal
 - README.md ===> this file
 - yarn.lock ===> used by yarn
 
-###Todo's
+### Todo's
 **Things I thought of but I havn't had time to implement, in no particular order**
 
 - Adding a simple CLI UI to take a users input for robot control instructions. Use something like [inquirer.js](https://github.com/SBoudrias/Inquirer.js/)
